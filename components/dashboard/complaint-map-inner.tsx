@@ -68,8 +68,8 @@ export default function ComplaintMapInner({ complaints }: Props) {
             attributionControl: false,
         });
 
-        // Free dark tile layer (CartoDB Dark Matter - no API key needed)
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        // Free light tile layer (CartoDB Light Matter)
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
             subdomains: 'abcd',
             maxZoom: 19,
@@ -90,16 +90,17 @@ export default function ComplaintMapInner({ complaints }: Props) {
 
             const popupContent = `
                 <div style="
-                    background: #0f111a;
-                    border: 1px solid rgba(255,255,255,0.1);
+                    background: #ffffff;
+                    border: 1px solid rgba(0,0,0,0.1);
                     border-radius: 12px;
                     padding: 14px;
-                    color: white;
+                    color: #1e293b;
                     font-family: system-ui, -apple-system, sans-serif;
                     min-width: 220px;
+                    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
                 ">
                     <div style="display: flex; align-items: start; justify-content: space-between; gap: 8px; margin-bottom: 8px;">
-                        <h4 style="font-size: 13px; font-weight: 700; color: #2dd4bf; margin: 0; line-height: 1.3;">
+                        <h4 style="font-size: 13px; font-weight: 700; color: #0d9488; margin: 0; line-height: 1.3;">
                             ${complaint.title}
                         </h4>
                         <span style="
@@ -108,7 +109,7 @@ export default function ComplaintMapInner({ complaints }: Props) {
                             background: ${color}22; color: ${color}; border: 1px solid ${color}33;
                         ">${complaint.severity || 'LOW'}</span>
                     </div>
-                    <p style="font-size: 11px; color: #94a3b8; margin: 0 0 10px 0; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                    <p style="font-size: 11px; color: #475569; margin: 0 0 10px 0; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
                         ${complaint.description}
                     </p>
                     <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -117,8 +118,8 @@ export default function ComplaintMapInner({ complaints }: Props) {
                             <span style="font-size: 10px; color: #64748b;">${complaint.status}</span>
                         </div>
                         <a href="/complaints/${complaint.id}" style="
-                            font-size: 10px; font-weight: 700; color: white;
-                            background: rgba(20,184,166,0.2); padding: 4px 12px;
+                            font-size: 10px; font-weight: 700; color: #0f766e;
+                            background: rgba(20,184,166,0.1); padding: 4px 12px;
                             border-radius: 8px; border: 1px solid rgba(20,184,166,0.2);
                             text-decoration: none;
                         ">View Details</a>
@@ -129,7 +130,7 @@ export default function ComplaintMapInner({ complaints }: Props) {
             marker.bindPopup(popupContent, {
                 maxWidth: 280,
                 closeButton: true,
-                className: 'dark-leaflet-popup',
+                className: 'light-leaflet-popup',
             });
         });
 
@@ -148,67 +149,67 @@ export default function ComplaintMapInner({ complaints }: Props) {
     }, []);
 
     return (
-        <Card className="relative w-full h-[500px] overflow-hidden rounded-2xl border border-white/10 bg-[#0a0c14] shadow-2xl">
+        <Card className="relative w-full h-[500px] overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg">
             {/* Map */}
-            <div ref={mapRef} className="w-full h-full" style={{ background: '#0a0c14' }} />
+            <div ref={mapRef} className="w-full h-full" style={{ background: '#f8fafc' }} />
 
             {/* Live Feed Overlay */}
             <div className="absolute top-4 left-4 z-[1000] pointer-events-none">
-                <div className="bg-[#0f111a]/80 backdrop-blur-md border border-white/10 p-3 rounded-2xl shadow-xl flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-teal-500/10 flex items-center justify-center border border-teal-500/20">
-                        <AlertTriangle className="w-5 h-5 text-teal-400" />
+                <div className="bg-white/90 backdrop-blur-md border border-gray-100 p-3 rounded-xl shadow-lg flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center border border-teal-100">
+                        <AlertTriangle className="w-5 h-5 text-teal-600" />
                     </div>
                     <div>
-                        <p className="text-[10px] font-bold text-white/50 uppercase tracking-widest">Live Feed</p>
-                        <p className="text-sm font-bold text-white">{complaints.length} Reports Detected</p>
+                        <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Live Feed</p>
+                        <p className="text-sm font-bold text-[#1e293b]">{complaints.length} Reports Detected</p>
                     </div>
                 </div>
             </div>
 
             {/* Legend */}
             <div className="absolute bottom-4 left-4 z-[1000] pointer-events-none">
-                <div className="bg-[#0f111a]/80 backdrop-blur-md border border-white/10 px-3 py-2 rounded-xl shadow-xl flex items-center gap-4">
+                <div className="bg-white/90 backdrop-blur-md border border-gray-100 px-3 py-2 rounded-xl shadow-lg flex items-center gap-4">
                     {Object.entries(STATUS_COLORS).slice(0, 4).map(([status, color]) => (
                         <div key={status} className="flex items-center gap-1.5">
                             <div className="w-2 h-2 rounded-full" style={{ background: color }} />
-                            <span className="text-[9px] text-gray-400 font-semibold uppercase">{status.replace('_', ' ')}</span>
+                            <span className="text-[9px] text-gray-600 font-bold uppercase">{status.replace('_', ' ')}</span>
                         </div>
                     ))}
                 </div>
             </div>
 
             <style jsx global>{`
-                .dark-leaflet-popup .leaflet-popup-content-wrapper {
+                .light-leaflet-popup .leaflet-popup-content-wrapper {
                     background: transparent !important;
                     box-shadow: none !important;
                     border-radius: 12px !important;
                     padding: 0 !important;
                 }
-                .dark-leaflet-popup .leaflet-popup-content {
+                .light-leaflet-popup .leaflet-popup-content {
                     margin: 0 !important;
                 }
-                .dark-leaflet-popup .leaflet-popup-tip {
-                    background: #0f111a !important;
-                    border: 1px solid rgba(255,255,255,0.1) !important;
+                .light-leaflet-popup .leaflet-popup-tip {
+                    background: #ffffff !important;
+                    border: 1px solid rgba(0,0,0,0.1) !important;
                     box-shadow: none !important;
                 }
-                .dark-leaflet-popup .leaflet-popup-close-button {
-                    color: #64748b !important;
+                .light-leaflet-popup .leaflet-popup-close-button {
+                    color: #94a3b8 !important;
                     font-size: 18px !important;
                     right: 8px !important;
                     top: 8px !important;
                     z-index: 10 !important;
                 }
-                .dark-leaflet-popup .leaflet-popup-close-button:hover {
-                    color: white !important;
+                .light-leaflet-popup .leaflet-popup-close-button:hover {
+                    color: #0f172a !important;
                 }
                 .leaflet-control-zoom a {
-                    background: #0f111a !important;
-                    color: white !important;
-                    border-color: rgba(255,255,255,0.1) !important;
+                    background: #ffffff !important;
+                    color: #1e293b !important;
+                    border-color: rgba(0,0,0,0.1) !important;
                 }
                 .leaflet-control-zoom a:hover {
-                    background: #1a1d2e !important;
+                    background: #f1f5f9 !important;
                 }
             `}</style>
         </Card>

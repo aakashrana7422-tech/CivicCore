@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache";
 
 export async function updateProfileImage(formData: FormData) {
     const session = await auth();
-    if (!session?.user?.email) {
+    if (!session?.user?.id || !session?.user?.email) {
         return { error: "Unauthorized" };
     }
 
@@ -36,11 +36,19 @@ export async function updateProfileImage(formData: FormData) {
         });
 
         const newImageUrl = uploadResult.secure_url;
+        console.log(`[DEBUG] Attempting update for user ID: ${session.user.id}, Email: ${session.user.email}`);
 
-        // Update User in Database
-        await prisma.user.update({
-            where: { email: session.user.email },
-            data: { image: newImageUrl }
+        // Upsert User in Database (Prevents "Record not found" error)
+        await prisma.user.upsert({
+            where: { id: session.user.id },
+            update: { image: newImageUrl },
+            create: {
+                id: session.user.id,
+                email: session.user.email,
+                name: session.user.name || session.user.email.split('@')[0],
+                image: newImageUrl,
+                role: session.user.role || 'CITIZEN',
+            }
         });
 
         revalidatePath('/profile');

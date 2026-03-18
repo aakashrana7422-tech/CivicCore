@@ -10,7 +10,6 @@ import { useState, useRef, useEffect } from 'react';
 import { updateProfileImage, getUserProfile } from '@/app/actions/user';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 
 interface UserReport {
     id: string;
@@ -94,18 +93,18 @@ export default function ProfilePage() {
         : session.user.email?.split('@')[0] || 'User';
 
     return (
-        <div className="min-h-screen bg-[#0a0a12] pt-8 pb-12 px-4 sm:px-6">
-            <div className="max-w-4xl mx-auto space-y-8">
+        <div className="min-h-screen bg-[#f8fafc] pt-12 pb-12 px-4 sm:px-6">
+            <div className="max-w-5xl mx-auto space-y-8">
 
                 {/* Hero Profile Card */}
-                <div className="relative overflow-hidden rounded-3xl bg-gray-900/50 border border-white/10 shadow-2xl backdrop-blur-xl">
-                    {/* Background decoration - different gradient for admin */}
-                    <div className={`absolute top-0 left-0 w-full h-32 blur-3xl opacity-50 ${isAdmin
-                        ? 'bg-gradient-to-r from-amber-500/20 via-teal-500/20 to-blue-500/20'
-                        : 'bg-gradient-to-r from-teal-500/20 via-blue-500/20 to-purple-500/20'
-                        }`} />
+                <div className="relative overflow-hidden rounded-3xl bg-[#002f5a] shadow-2xl">
+                    {/* Background decoration - subtle patterns */}
+                    <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+                        <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[60%] bg-orange-500 rounded-full blur-[100px]" />
+                        <div className="absolute bottom-[-10%] left-[-10%] w-[30%] h-[50%] bg-blue-400 rounded-full blur-[100px]" />
+                    </div>
 
-                    <div className="relative p-8 md:p-10">
+                    <div className="relative p-8 md:p-12">
                         <div className="flex flex-col md:flex-row items-center gap-8">
 
                             {/* Avatar Section */}
@@ -149,26 +148,26 @@ export default function ProfilePage() {
                                 />
                             </div>
 
-                            {/* Info Section */}
+                             {/* Info Section - Already refined in previous step partially, but double checking */}
                             <div className="flex-1 text-center md:text-left space-y-3">
                                 <div>
-                                    <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
+                                    <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
                                         {displayName}
                                     </h1>
-                                    <p className="text-gray-400 flex items-center justify-center md:justify-start gap-2 mt-1">
-                                        <Mail size={14} /> {session.user.email}
+                                    <p className="text-blue-200/70 flex items-center justify-center md:justify-start gap-2 mt-1 font-medium">
+                                        <Mail size={14} className="text-orange-400" /> {session.user.email}
                                     </p>
                                 </div>
 
                                 <div className="flex flex-wrap justify-center md:justify-start gap-3">
                                     <Badge variant="outline" className={`px-3 py-1 uppercase tracking-wider text-xs font-semibold ${isAdmin
-                                        ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-                                        : 'bg-teal-500/10 text-teal-400 border-teal-500/20'
+                                        ? 'bg-orange-500/10 text-orange-600 border-orange-500/20'
+                                        : 'bg-blue-500/10 text-blue-600 border-blue-500/20'
                                         }`}>
                                         <Shield size={12} className="mr-1.5" />
                                         {session.user.role}
                                     </Badge>
-                                    <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-blue-500/20 px-3 py-1 uppercase tracking-wider text-xs font-semibold">
+                                    <Badge variant="outline" className="bg-orange-500/10 text-orange-600 border-orange-500/20 px-3 py-1 uppercase tracking-wider text-xs font-semibold">
                                         <Calendar size={12} className="mr-1.5" />
                                         Member since 2024
                                     </Badge>
@@ -179,28 +178,28 @@ export default function ProfilePage() {
                             <div className="grid grid-cols-2 gap-4 w-full md:w-auto">
                                 {isAdmin ? (
                                     <>
-                                        <div className="bg-amber-500/5 border border-amber-500/10 rounded-2xl p-4 text-center backdrop-blur-sm hover:bg-amber-500/10 transition-colors cursor-default">
-                                            <div className="text-2xl font-bold text-amber-400">
+                                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center hover:bg-white/10 transition-all cursor-default shadow-lg">
+                                            <div className="text-2xl font-bold text-orange-400">
                                                 <Shield size={24} className="mx-auto" />
                                             </div>
-                                            <div className="text-[10px] text-gray-500 uppercase font-bold tracking-widest mt-1">Admin</div>
+                                            <div className="text-[10px] text-blue-100/60 uppercase font-black tracking-widest mt-2">Admin</div>
                                         </div>
-                                        <div className="bg-teal-500/5 border border-teal-500/10 rounded-2xl p-4 text-center backdrop-blur-sm hover:bg-teal-500/10 transition-colors cursor-default">
-                                            <div className="text-2xl font-bold text-teal-400">
+                                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center hover:bg-white/10 transition-all cursor-default shadow-lg">
+                                            <div className="text-2xl font-bold text-white">
                                                 <BarChart3 size={24} className="mx-auto" />
                                             </div>
-                                            <div className="text-[10px] text-gray-500 uppercase font-bold tracking-widest mt-1">Manager</div>
+                                            <div className="text-[10px] text-blue-100/60 uppercase font-black tracking-widest mt-2">Manager</div>
                                         </div>
                                     </>
                                 ) : (
                                     <>
-                                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center backdrop-blur-sm hover:bg-white/10 transition-colors cursor-default">
-                                            <div className="text-2xl font-bold text-teal-400">{isLoading ? '—' : reportCount}</div>
-                                            <div className="text-[10px] text-gray-500 uppercase font-bold tracking-widest mt-1">Reports</div>
+                                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center hover:bg-white/10 transition-all cursor-default shadow-lg">
+                                            <div className="text-2xl font-black text-white">{isLoading ? '—' : reportCount}</div>
+                                            <div className="text-[10px] text-blue-100/60 uppercase font-extrabold tracking-widest mt-1">Reports</div>
                                         </div>
-                                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center backdrop-blur-sm hover:bg-white/10 transition-colors cursor-default">
-                                            <div className="text-2xl font-bold text-yellow-400">{isLoading ? '—' : karmaPoints}</div>
-                                            <div className="text-[10px] text-gray-500 uppercase font-bold tracking-widest mt-1">Karma</div>
+                                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center hover:bg-white/10 transition-all cursor-default shadow-lg">
+                                            <div className="text-2xl font-black text-orange-400">{isLoading ? '—' : karmaPoints}</div>
+                                            <div className="text-[10px] text-blue-100/60 uppercase font-extrabold tracking-widest mt-1">Karma</div>
                                         </div>
                                     </>
                                 )}
@@ -211,37 +210,40 @@ export default function ProfilePage() {
 
                 {/* Main Content Tabs */}
                 <Tabs defaultValue="activity" className="w-full">
-                    <div className="flex justify-center md:justify-start mb-6">
-                        <TabsList className="bg-gray-900/50 border border-white/10 p-1 rounded-xl">
-                            <TabsTrigger value="activity" className="px-6 data-[state=active]:bg-teal-500 data-[state=active]:text-white rounded-lg">
-                                {isAdmin ? 'Admin Overview' : 'Activity'}
+                    <div className="flex justify-center md:justify-start mb-10">
+                        <TabsList className="bg-white border border-gray-200 p-1 rounded-2xl shadow-sm h-14">
+                            <TabsTrigger value="activity" className="px-8 h-full data-[state=active]:bg-[#002f5a] data-[state=active]:text-white rounded-xl transition-all font-bold text-gray-500">
+                                {isAdmin ? 'Admin Portal' : 'My Activity'}
                             </TabsTrigger>
-                            <TabsTrigger value="settings" className="px-6 data-[state=active]:bg-teal-500 data-[state=active]:text-white rounded-lg">Settings</TabsTrigger>
+                            <TabsTrigger value="settings" className="px-8 h-full data-[state=active]:bg-[#002f5a] data-[state=active]:text-white rounded-xl transition-all font-bold text-gray-500">Settings</TabsTrigger>
                         </TabsList>
                     </div>
 
                     <TabsContent value="activity">
                         {isAdmin ? (
                             /* ===== ADMIN ACTIVITY TAB ===== */
-                            <Card className="bg-gray-900/40 border-white/10 text-white backdrop-blur-md">
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-2">
-                                        <Shield className="text-amber-400" /> Admin Command Overview
+                            <Card className="bg-white border-gray-100 text-[#002f5a] shadow-xl rounded-2xl overflow-hidden">
+                                <CardHeader className="border-b border-gray-50 pb-6">
+                                    <CardTitle className="flex items-center gap-3 text-xl font-extrabold">
+                                        <div className="p-2 bg-orange-500/10 rounded-lg">
+                                            <Shield className="text-orange-500 w-5 h-5" />
+                                        </div>
+                                        Admin Command Overview
                                     </CardTitle>
-                                    <CardDescription className="text-gray-400">
+                                    <CardDescription className="text-gray-500 font-medium">
                                         Your administrative role and access summary.
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-6">
                                     {/* Admin Role Card */}
-                                    <div className="p-6 rounded-2xl border border-amber-500/10 bg-gradient-to-br from-amber-500/5 to-teal-500/5">
+                                    <div className="p-6 rounded-2xl border border-orange-500/10 bg-gradient-to-br from-orange-500/5 to-blue-500/5">
                                         <div className="flex items-start gap-4">
-                                            <div className="p-3 bg-amber-500/10 rounded-xl border border-amber-500/20">
-                                                <Shield className="w-6 h-6 text-amber-400" />
+                                            <div className="p-3 bg-orange-500/10 rounded-xl border border-orange-500/20">
+                                                <Shield className="w-6 h-6 text-orange-500" />
                                             </div>
                                             <div className="flex-1">
-                                                <h3 className="text-lg font-bold text-white">Municipal Administrator</h3>
-                                                <p className="text-sm text-gray-400 mt-1">
+                                                <h3 className="text-lg font-bold text-[#002f5a]">Municipal Administrator</h3>
+                                                <p className="text-sm text-gray-500 mt-1 font-medium">
                                                     You have full access to manage infrastructure reports, update statuses, resolve complaints, and oversee the municipal response workflow.
                                                 </p>
                                             </div>
@@ -250,50 +252,53 @@ export default function ProfilePage() {
 
                                     {/* Quick Actions */}
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                        <Link href="/admin" className="group p-4 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-teal-500/5 hover:border-teal-500/20 transition-all">
+                                        <Link href="/admin" className="group p-4 rounded-xl border border-gray-100 bg-gray-50/50 hover:bg-orange-50/50 hover:border-orange-200 transition-all">
                                             <div className="flex items-center gap-3">
-                                                <div className="p-2 bg-teal-500/10 rounded-lg border border-teal-500/20 group-hover:bg-teal-500/20 transition-colors">
-                                                    <BarChart3 className="w-4 h-4 text-teal-400" />
+                                                <div className="p-2 bg-orange-500/10 rounded-lg border border-orange-200 group-hover:bg-orange-500/20 transition-colors">
+                                                    <BarChart3 className="w-4 h-4 text-orange-500" />
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm font-semibold text-white">Admin Command Center</p>
-                                                    <p className="text-[11px] text-gray-500">Manage all citizen reports</p>
+                                                    <p className="text-sm font-bold text-[#002f5a]">Command Center</p>
+                                                    <p className="text-[11px] text-gray-400">Manage citizen reports</p>
                                                 </div>
                                             </div>
                                         </Link>
-                                        <div className="p-4 rounded-xl border border-white/10 bg-white/[0.02]">
+                                        <div className="p-4 rounded-xl border border-gray-100 bg-gray-50/50 hover:bg-green-50/50 transition-all">
                                             <div className="flex items-center gap-3">
-                                                <div className="p-2 bg-green-500/10 rounded-lg border border-green-500/20">
-                                                    <CheckCircle2 className="w-4 h-4 text-green-400" />
+                                                <div className="p-2 bg-green-500/10 rounded-lg border border-green-200">
+                                                    <CheckCircle2 className="w-4 h-4 text-green-600" />
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm font-semibold text-white">Resolve Issues</p>
-                                                    <p className="text-[11px] text-gray-500">Update statuses & close tickets</p>
+                                                    <p className="text-sm font-bold text-[#002f5a]">Issue Resolver</p>
+                                                    <p className="text-[11px] text-gray-400">Manage ticket lifecycles</p>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
                                     {/* Access Level */}
-                                    <div className="p-4 rounded-xl border border-white/5 bg-black/20">
-                                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                                    <div className="p-4 rounded-xl border border-orange-200 bg-orange-50/30">
+                                        <div className="flex items-center gap-2 text-xs text-orange-700">
                                             <AlertTriangle className="w-3.5 h-3.5" />
-                                            <span className="font-semibold uppercase tracking-wider">Access Level: Full Administrative</span>
+                                            <span className="font-bold uppercase tracking-widest text-[10px]">Access Level: Full Administrative Control</span>
                                         </div>
-                                        <p className="text-[11px] text-gray-600 mt-1">
-                                            You can view all reports, change statuses, resolve/reject complaints, and manage the municipal response pipeline.
+                                        <p className="text-[11px] text-gray-500 mt-1 font-medium italic">
+                                            Authorized for organization-wide report management and status overrides.
                                         </p>
                                     </div>
                                 </CardContent>
                             </Card>
                         ) : (
                             /* ===== CITIZEN ACTIVITY TAB ===== */
-                            <Card className="bg-gray-900/40 border-white/10 text-white backdrop-blur-md">
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-2">
-                                        <MapPin className="text-teal-400" /> Recent Reports
+                            <Card className="bg-white border-gray-100 text-[#002f5a] shadow-xl rounded-2xl overflow-hidden">
+                                <CardHeader className="border-b border-gray-50 pb-6">
+                                    <CardTitle className="flex items-center gap-3 text-xl font-extrabold">
+                                        <div className="p-2 bg-orange-500/10 rounded-lg">
+                                            <MapPin className="text-orange-500 w-5 h-5" />
+                                        </div>
+                                        Recent Reports
                                     </CardTitle>
-                                    <CardDescription className="text-gray-400">
+                                    <CardDescription className="text-gray-500 font-medium">
                                         Track the status of the infrastructure issues you&apos;ve reported.
                                     </CardDescription>
                                 </CardHeader>
@@ -334,47 +339,47 @@ export default function ProfilePage() {
                                                 };
                                                 return (
                                                     <Link key={report.id} href={`/complaints/${report.id}`}>
-                                                        <div className="group p-4 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-teal-500/20 transition-all cursor-pointer">
+                                                        <div className="group p-5 rounded-2xl border border-gray-200 bg-white hover:bg-gray-50 hover:border-orange-200 transition-all cursor-pointer shadow-sm hover:shadow-md">
                                                             <div className="flex gap-4">
                                                                 {/* Thumbnail */}
                                                                 {report.image && (
-                                                                    <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-800 shrink-0">
-                                                                        <img src={report.image} alt={report.title} className="w-full h-full object-cover" />
+                                                                    <div className="w-20 h-20 rounded-xl overflow-hidden bg-gray-100 shrink-0 border border-gray-100 shadow-inner">
+                                                                        <img src={report.image} alt={report.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                                                                     </div>
                                                                 )}
                                                                 {/* Details */}
                                                                 <div className="flex-1 min-w-0">
                                                                     <div className="flex items-start justify-between gap-2">
-                                                                        <h3 className="font-semibold text-white truncate group-hover:text-teal-400 transition-colors">
+                                                                        <h3 className="font-bold text-[#002f5a] truncate group-hover:text-orange-600 transition-colors">
                                                                             {report.title}
                                                                         </h3>
-                                                                        <Badge variant="outline" className={`shrink-0 text-[10px] px-2 py-0.5 uppercase font-bold ${statusColors[report.status] || 'bg-gray-500/10 text-gray-400'}`}>
+                                                                        <Badge variant="outline" className={`shrink-0 text-[10px] px-2 py-0.5 uppercase font-extrabold tracking-tighter ${statusColors[report.status] || 'bg-gray-100 text-gray-400 border-gray-200'}`}>
                                                                             {report.status.replace('_', ' ')}
                                                                         </Badge>
                                                                     </div>
-                                                                    <div className="flex items-center gap-3 mt-1.5 text-xs text-gray-500">
+                                                                    <div className="flex items-center gap-3 mt-1.5 text-xs text-gray-500 font-medium">
                                                                         <span className="flex items-center gap-1">
-                                                                            <Badge variant="outline" className={`text-[10px] px-1.5 py-0 border-0 ${severityColors[report.severity] || 'text-gray-400'}`}>
+                                                                            <Badge variant="outline" className={`text-[10px] px-1.5 py-0 border-0 font-bold ${severityColors[report.severity] || 'text-gray-400'}`}>
                                                                                 {report.severity}
                                                                             </Badge>
                                                                         </span>
-                                                                        <span className="text-gray-600">•</span>
-                                                                        <span>{report.category}</span>
+                                                                        <span className="text-gray-300">•</span>
+                                                                        <span className="text-gray-600">{report.category}</span>
                                                                     </div>
-                                                                    <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                                                                    <div className="flex items-center gap-4 mt-3 text-xs text-gray-400">
                                                                         {report.address && (
-                                                                            <span className="flex items-center gap-1 truncate">
-                                                                                <MapPin size={11} /> {report.address.split(',').slice(0, 2).join(',')}
+                                                                            <span className="flex items-center gap-1 truncate max-w-[200px]">
+                                                                                <MapPin size={12} className="text-orange-400" /> {report.address.split(',').slice(0, 2).join(',')}
                                                                             </span>
                                                                         )}
                                                                         <span className="flex items-center gap-1">
-                                                                            <ThumbsUp size={11} /> {report.votes}
+                                                                            <ThumbsUp size={11} className="text-gray-400" /> {report.votes}
                                                                         </span>
                                                                         <span className="flex items-center gap-1">
-                                                                            <MessageSquare size={11} /> {report.comments}
+                                                                            <MessageSquare size={11} className="text-gray-400" /> {report.comments}
                                                                         </span>
                                                                         <span className="flex items-center gap-1 ml-auto">
-                                                                            <Clock size={11} /> {new Date(report.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                                                            <Clock size={11} className="text-gray-400" /> {new Date(report.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                                                                         </span>
                                                                     </div>
                                                                 </div>
@@ -386,7 +391,7 @@ export default function ProfilePage() {
                                             {/* Report More Button */}
                                             <div className="text-center pt-2">
                                                 <Link href="/report">
-                                                    <Button variant="outline" className="border-teal-500/30 text-teal-400 hover:bg-teal-500/10">
+                                                    <Button variant="outline" className="border-orange-500/30 text-orange-600 hover:bg-orange-500/5 hover:text-orange-700 rounded-xl">
                                                         + Report Another Issue
                                                     </Button>
                                                 </Link>
@@ -399,43 +404,46 @@ export default function ProfilePage() {
                     </TabsContent>
 
                     <TabsContent value="settings">
-                        <Card className="bg-gray-900/40 border-white/10 text-white backdrop-blur-md">
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <Settings className="w-5 h-5 text-teal-400" />
-                                    Profile Settings
+                        <Card className="bg-white border-gray-100 text-[#002f5a] shadow-xl rounded-2xl overflow-hidden">
+                            <CardHeader className="border-b border-gray-50 pb-6">
+                                <CardTitle className="flex items-center gap-3 text-xl font-extrabold">
+                                    <div className="p-2 bg-orange-500/10 rounded-lg">
+                                        <Settings className="w-5 h-5 text-orange-500" />
+                                    </div>
+                                    Account Settings
                                 </CardTitle>
-                                <CardDescription className="text-gray-400">
+                                <CardDescription className="text-gray-500 font-medium">
                                     View and manage your account details.
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-6">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-300">Display Name</label>
+                                    <label className="text-xs font-bold uppercase tracking-widest text-[#002f5a]/60">Display Name</label>
                                     <input
                                         type="text"
                                         value={displayName}
                                         disabled
-                                        className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-lg text-gray-300 cursor-not-allowed focus:outline-none"
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-[#002f5a] font-semibold cursor-not-allowed focus:outline-none"
                                     />
-                                    <p className="text-xs text-gray-500">To change your name, please update your Google account profile.</p>
+                                    <p className="text-[10px] text-gray-400 font-medium italic">Name updates are managed via your Google account.</p>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-300">Email Address</label>
+                                    <label className="text-xs font-bold uppercase tracking-widest text-[#002f5a]/60">Email Address</label>
                                     <input
                                         type="text"
                                         value={session.user.email || ''}
                                         disabled
-                                        className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-lg text-gray-300 cursor-not-allowed focus:outline-none"
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-[#002f5a] font-semibold cursor-not-allowed focus:outline-none"
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-300">Role</label>
-                                    <div className={`w-full px-4 py-2.5 rounded-lg border font-semibold text-sm ${isAdmin
-                                        ? 'bg-amber-500/5 border-amber-500/20 text-amber-400'
-                                        : 'bg-teal-500/5 border-teal-500/20 text-teal-400'
+                                    <label className="text-xs font-bold uppercase tracking-widest text-[#002f5a]/60">Account Role</label>
+                                    <div className={`w-full px-4 py-3 rounded-xl border font-bold text-sm flex items-center gap-2 ${isAdmin
+                                        ? 'bg-orange-50 border-orange-200 text-orange-700'
+                                        : 'bg-blue-50 border-blue-200 text-blue-700'
                                         }`}>
-                                        {isAdmin ? '🛡️ Municipal Administrator' : '👤 Citizen'}
+                                        <Shield size={16} className={isAdmin ? 'text-orange-500' : 'text-blue-500'} />
+                                        {isAdmin ? 'Municipal Administrator' : 'Verified Citizen Participant'}
                                     </div>
                                 </div>
                             </CardContent>

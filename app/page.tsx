@@ -1,72 +1,243 @@
-import { Button } from '@/components/ui/button';
+'use client';
+
 import Link from 'next/link';
-import { ArrowRight, Shield, Video, Zap } from 'lucide-react';
-import { ConcentricCircles } from '@/components/ui/concentric-circles';
+import { Bell, User, MapPin, CheckCircle2, AlertTriangle, Lightbulb, Droplet, Menu, ShieldCheck, PlusCircle } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 
 export default function Home() {
   return (
-    <main className="min-h-screen flex flex-col relative overflow-hidden">
-      {/* Navbar Placeholder (assume generic layout handles it or add here) */}
-      <ConcentricCircles />
-
-      {/* Hero Section */}
-      <section className="flex-1 flex flex-col items-center justify-center text-center px-4 py-20 bg-gradient-to-b from-transparent to-black/20 relative z-10">
-        <div className="space-y-6 max-w-3xl relative">
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-teal-400 to-emerald-400 animate-pulse-slow">
-            CivicCore
-          </h1>
-          <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
-            A transparent, AI-powered ecosystem for citizens to report infrastructure failures and for authorities to resolve them.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
-            <Link href="/report">
-              <Button size="lg" className="text-lg px-8 h-14 bg-blue-600 hover:bg-blue-700 shadow-xl shadow-blue-500/20">
-                Report Issue
-                <Zap className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-            <Link href="/dashboard">
-              <Button size="lg" variant="glass" className="text-lg px-8 h-14 hover:bg-white/10">
-                View Dashboard
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
+    <>
+      <style dangerouslySetInnerHTML={{ __html: `
+        main { padding: 0 !important; }
+      `}} />
+      <div className="min-h-screen bg-[#f8fafc] font-sans">
+      <div className="w-full bg-[#f8fafc] relative">
+        
+        {/* TOP NAV */}
+        <div className="bg-[#002f5a] text-white px-6 py-4 flex items-center justify-between z-20 relative">
+          <div className="flex items-center gap-8 max-w-7xl mx-auto w-full">
+            <h1 className="text-xl font-bold flex items-center gap-2">
+              <span className="text-blue-400">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                   <rect x="4" y="12" width="4" height="8" rx="1" fill="#fff" />
+                   <rect x="10" y="8" width="4" height="12" rx="1" fill="#fb923c" />
+                   <rect x="16" y="4" width="4" height="16" rx="1" fill="#fff" />
+                </svg>
+              </span>
+              <span className="hidden sm:inline force-white" style={{ color: '#ffffff' }}>CivicCore</span>
+            </h1>
+            <nav className="hidden md:flex items-center gap-6 text-[13px] font-medium tracking-wide">
+              <Link href="/" className="relative text-white flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-300"></span>
+                Home
+              </Link>
+                <Link href="/report" className="text-blue-200 hover:text-white transition-colors" style={{ color: '#bfdbfe' }}>Report issue</Link>
+                <Link href="/my-reports" className="text-blue-200 hover:text-white transition-colors" style={{ color: '#bfdbfe' }}>My Reports</Link>
+                <Link href="/dashboard" className="text-blue-200 hover:text-white transition-colors" style={{ color: '#bfdbfe' }}>Dashboard</Link>
+            </nav>
+          </div>
+          <div className="flex items-center gap-5 pr-6">
+            <button className="relative text-orange-400 hover:text-orange-300 transition-colors">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+              <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-orange-500 rounded-full border-2 border-[#002f5a]"></span>
+            </button>
+            <button className="text-blue-200 hover:text-white">
+               <Menu className="w-5 h-5" />
+            </button>
+            <Link href="/profile" className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center border border-white/20 cursor-pointer">
+               <User className="w-4 h-4 text-white" />
             </Link>
           </div>
         </div>
-      </section>
 
-      {/* Feature Grid */}
-      <section className="py-20 px-4 bg-black/40 backdrop-blur-sm border-t border-white/5">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-          <FeatureCard
-            icon={<Video className="w-8 h-8 text-blue-400" />}
-            title="Smart Reporting"
-            description="Upload a photo, and our AI instantly analyzes the issue, extracts location, and categorizes severity."
-          />
-          <FeatureCard
-            icon={<Shield className="w-8 h-8 text-teal-400" />}
-            title="Proof of Work"
-            description="Admins must upload 'Before vs After' evidence to close tickets, ensuring total transparency."
-          />
-          <FeatureCard
-            icon={<Zap className="w-8 h-8 text-yellow-400" />}
-            title="Gamified Impact"
-            description="Earn Karma points for verified reports. Climb the leaderboard and be a civic hero."
-          />
+        {/* HERO SECTION */}
+        <div className="relative h-[480px] bg-[#002f5a]">
+            {/* Background Image Overlay */}
+            <div 
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-80"
+              style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=2000&auto=format&fit=crop")' }}
+            >
+                {/* Gradient overlay to ensure text is readable like in mock */}
+                <div className="absolute inset-0 bg-gradient-to-r from-[#002f5a] via-[#002f5a]/80 to-transparent"></div>
+            </div>
+
+            <div className="relative z-10 px-8 pt-24 max-w-7xl mx-auto w-full">
+                <div className="max-w-2xl">
+                    <h2 className="text-white force-white text-6xl font-extrabold leading-tight mb-4 font-sans" style={{ color: '#ffffff' }}>
+                       Report Civic Issues,<br/>Get Them Fixed!
+                    </h2>
+                    <p className="text-blue-100 text-xl mb-10 tracking-wide font-medium" style={{ color: '#dbeafe' }}>
+                       Make Your City Better with AI-Powered Reporting
+                    </p>
+                    <Link href="/report">
+                        <button 
+                          className="bg-[#f97316] hover:bg-[#ea580c] text-white force-white px-10 py-4 rounded-xl text-lg font-bold shadow-2xl shadow-orange-500/40 transition-all hover:scale-105 active:scale-95 flex items-center gap-3"
+                          style={{ color: '#ffffff' }}
+                        >
+                           Report an issue
+                           <PlusCircle className="w-5 h-5" />
+                        </button>
+                    </Link>
+                </div>
+            </div>
+
+            {/* Wavy Divider */}
+            <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none z-10">
+                <svg className="relative block w-full h-[80px]" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                    <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C52.16,108.7,106.97,110.15,162.2,102.54,213.7,95.4,267.4,77.3,321.39,56.44Z" fill="#f8fafc"></path>
+                </svg>
+            </div>
         </div>
-      </section>
-    </main>
-  );
-}
 
-function FeatureCard({ icon, title, description }: { icon: any, title: string, description: string }) {
-  return (
-    <div className="p-6 rounded-xl glass-card hover:-translate-y-1 transition-transform cursor-default">
-      <div className="mb-4 bg-white/5 w-14 h-14 rounded-lg flex items-center justify-center border border-white/10">
-        {icon}
+        {/* CONTENT SECTIONS */}
+        <div className="px-8 pb-16 relative z-20 -mt-2 max-w-7xl mx-auto w-full">
+            
+            {/* Stats Row */}
+            <div className="grid grid-cols-1 md:grid-cols-4 items-center justify-between mb-12 gap-8 px-4">
+                <div className="text-center md:border-r border-gray-200 px-4">
+                    <div className="text-5xl font-extrabold text-[#1e293b] mb-2 tracking-tight">5,280</div>
+                    <div className="text-sm text-gray-400 font-bold tracking-widest uppercase">Issues Reported</div>
+                </div>
+                <div className="text-center md:border-r border-gray-200 px-4">
+                    <div className="text-5xl font-extrabold text-[#1e293b] mb-2 tracking-tight">832</div>
+                    <div className="text-sm text-gray-400 font-bold tracking-widest uppercase">In Progress</div>
+                </div>
+                <div className="text-center md:border-r border-gray-200 px-4">
+                    <div className="text-5xl font-extrabold text-[#1e293b] mb-2 tracking-tight">4,150</div>
+                    <div className="text-sm text-gray-400 font-bold tracking-widest uppercase">Resolved</div>
+                </div>
+                <div className="flex justify-center md:justify-end pr-4">
+                    <div className="w-20 h-20 bg-white shadow-xl rounded-2xl flex items-center justify-center relative overflow-hidden border border-gray-50 transition-transform hover:scale-105">
+                        <div className="absolute inset-0 bg-blue-50/50"></div>
+                        <ShieldCheck className="w-10 h-10 text-blue-600 relative z-10" />
+                        <div className="absolute bottom-2 w-10 h-1.5 bg-yellow-400 rounded-full z-10"></div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Map Section - Focused on Global View (Original Version) */}
+            <div className="w-full h-[500px] bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden relative mb-12 transform transition-all group hover:shadow-2xl">
+                 {/* Original Global Map Background */}
+                 <div 
+                   className="absolute inset-0 bg-cover bg-center transition-transform duration-[10s] group-hover:scale-110 opacity-70 grayscale-[20%]"
+                   style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=2000&auto=format&fit=crop")' }}
+                 >
+                    {/* Darker overlay on the map edges to draw focus to pins */}
+                    <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-white/20"></div>
+                 </div>
+                 
+                 {/* Pothole Pin */}
+                 <div className="absolute top-[40%] left-[15%] flex flex-col items-center animate-bounce-slow">
+                    <div className="bg-[#002f5a] text-white force-white text-[12px] font-bold px-4 py-2 rounded-xl shadow-xl flex items-center gap-2 mb-2 border border-white/20 backdrop-blur-sm">
+                        <div className="w-2.5 h-2.5 bg-blue-400 rounded-full animate-pulse"></div>
+                        <span>Pothole</span>
+                    </div>
+                    <MapPin className="text-[#002f5a] fill-white w-8 h-8 -mt-2 drop-shadow-2xl" />
+                 </div>
+
+                 {/* Garbage Pin */}
+                 <div className="absolute top-[60%] left-[35%] flex flex-col items-center">
+                    <div className="bg-[#16a34a] text-white force-white text-[12px] font-bold px-4 py-2 rounded-xl shadow-xl flex items-center gap-2 mb-2 border border-white/20 backdrop-blur-sm">
+                        <div className="w-2.5 h-2.5 bg-white rounded-full animate-pulse"></div>
+                        <span>Garbage</span>
+                    </div>
+                    <MapPin className="text-[#16a34a] fill-white w-8 h-8 -mt-2 drop-shadow-2xl" />
+                 </div>
+
+                 {/* Streetlight Pin */}
+                 <div className="absolute top-[20%] right-[35%] flex flex-col items-center">
+                    <div className="bg-[#ef4444] text-white force-white text-[12px] font-bold px-4 py-2 rounded-xl shadow-xl flex items-center gap-2 mb-2 border border-white/20 backdrop-blur-sm">
+                        <div className="w-2.5 h-2.5 bg-white rounded-full animate-pulse"></div>
+                        <span>Streetlight</span>
+                    </div>
+                    <MapPin className="text-[#ef4444] fill-white w-8 h-8 -mt-2 drop-shadow-2xl" />
+                 </div>
+                 
+                 {/* Water Leak Pin */}
+                 <div className="absolute top-[50%] right-[15%] flex flex-col items-center">
+                    <div className="bg-[#ea580c] text-white force-white text-[12px] font-bold px-4 py-2 rounded-xl shadow-xl flex items-center gap-2 mb-2 border border-white/20 backdrop-blur-sm">
+                        <div className="w-2.5 h-2.5 bg-orange-200 rounded-full animate-pulse"></div>
+                        <span>Water Leak</span>
+                    </div>
+                     <MapPin className="text-[#ea580c] fill-white w-8 h-8 -mt-2 drop-shadow-2xl" />
+                 </div>
+            </div>
+
+            {/* Bottom 2 Cards Grid */}
+            <div className="grid grid-cols-2 gap-6">
+                
+                {/* Verify & Track Issues Card */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-col">
+                    <div className="flex items-center gap-2 mb-4">
+                        <div className="w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center">
+                           <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+                        </div>
+                        <h3 className="font-bold text-[#1e293b] text-sm">Verify & Track Issues</h3>
+                    </div>
+                    
+                    <div className="bg-[#002f5a] rounded-lg p-4 mb-3 relative overflow-hidden">
+                        <div className="absolute right-0 top-0 opacity-10">
+                           <ShieldCheck className="w-16 h-16" />
+                        </div>
+                        <h4 className="text-white font-bold text-lg mb-4">AI Verified:<br/>92%</h4>
+                        <div className="bg-[#16a34a] text-white text-[11px] font-bold px-3 py-1.5 rounded-md inline-block w-full text-center shadow-sm">
+                            Community Confirmed: 8 Responses
+                        </div>
+                    </div>
+
+                    <div className="mt-auto h-24 rounded-lg bg-gray-200 overflow-hidden relative">
+                         <div 
+                           className="absolute inset-0 bg-cover bg-center"
+                           style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=800&auto=format&fit=crop")' }}
+                         ></div>
+                    </div>
+                </div>
+
+                {/* Priority Cases Card */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-col">
+                    <div className="flex items-center gap-2 mb-4">
+                        <div className="w-6 h-6 rounded-full bg-orange-50 flex items-center justify-center">
+                           <AlertTriangle className="w-3.5 h-3.5 text-orange-500" />
+                        </div>
+                        <h3 className="font-bold text-[#1e293b] text-sm">Priority Cases</h3>
+                    </div>
+
+                    <div className="bg-gradient-to-br from-red-600 to-rose-500 rounded-2xl p-6 mb-4 relative overflow-hidden text-white shadow-xl shadow-red-500/20">
+                        <div className="text-sm font-bold text-red-100 mb-2 uppercase tracking-widest opacity-90">High Priority</div>
+                        <h4 className="font-extrabold text-2xl mb-4 leading-tight">Collapsed Road<br/>Near City Center</h4>
+                        <div className="flex justify-between items-center">
+                            <span className="font-bold bg-white/20 backdrop-blur-md px-4 py-1.5 rounded-full text-xs">Action Needed</span>
+                            <span className="text-xs font-bold text-red-100">Pending: 7 Days</span>
+                        </div>
+                    </div>
+
+                    <div className="space-y-2 mt-auto">
+                        <div className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center">
+                                    <Droplet className="w-4 h-4 text-orange-500" />
+                                </div>
+                                <span className="text-xs font-semibold text-[#1e293b]">Water Leak Hoday</span>
+                            </div>
+                            <span className="text-[10px] text-gray-400 font-medium">9/208.19532 &gt;</span>
+                        </div>
+                        
+                        <div className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-full bg-yellow-50 flex items-center justify-center">
+                                    <Lightbulb className="w-4 h-4 text-yellow-500" />
+                                </div>
+                                <span className="text-xs font-semibold text-[#1e293b]">Streetlight Repaired</span>
+                            </div>
+                            <span className="text-[10px] text-gray-400 font-medium tracking-tight">by City Lights &gt;</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
       </div>
-      <h3 className="text-xl font-bold mb-2">{title}</h3>
-      <p className="text-muted-foreground">{description}</p>
     </div>
+    </>
   );
 }

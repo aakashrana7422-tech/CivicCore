@@ -40,141 +40,102 @@ export function Navbar() {
         setDropdownOpen(false);
     }, [pathname]);
 
+    // If on homepage, hide this generic navbar since homepage has a custom one
+    if (pathname === '/') return null;
+
+
     return (
-        <nav className="fixed top-0 left-0 right-0 z-50 flex justify-center p-4">
-            <div className="glass-panel flex items-center justify-between w-full max-w-7xl px-6 py-3 rounded-2xl shadow-2xl border border-white/10">
-                <Link href="/" className="flex items-center space-x-2">
-                    <div className="bg-gradient-to-br from-teal-400 to-blue-500 p-2 rounded-lg">
-                        <ShieldCheck className="w-6 h-6 text-white" />
-                    </div>
-                    <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
-                        CivicCore
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-[#002f5a] text-white px-6 py-4 flex items-center justify-between shadow-md">
+            <div className="flex items-center gap-8 w-full max-w-[1200px] mx-auto">
+                <Link href="/" className="text-xl font-bold flex items-center gap-2">
+                    <span className="text-blue-400">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="4" y="12" width="4" height="8" rx="1" fill="#fff" />
+                            <rect x="10" y="8" width="4" height="12" rx="1" fill="#fb923c" />
+                            <rect x="16" y="4" width="4" height="16" rx="1" fill="#fff" />
+                        </svg>
                     </span>
+                    <span className="hidden sm:inline" style={{ color: "#ffffff" }}>CivicCore</span>
                 </Link>
 
-                <div className="hidden md:flex items-center space-x-8">
+                <div className="hidden md:flex items-center gap-6 text-[13px] font-medium tracking-wide">
                     {navItems
                         .filter(item => {
-                            // Hide "Report" and "Dashboard" for Admins if they are purely in admin mode
-                            if (session?.user?.role === 'ADMIN') {
-                                if (item.name === 'Report' || item.name === 'Dashboard') return false;
-                            }
+                            if (session?.user?.role === 'ADMIN' && (item.name === 'Report' || item.name === 'Dashboard')) return false;
                             return true;
                         })
-                        .map((item) => {
-                            // If it's the Home link and user is Admin, we can optionally point them to /admin
-                            const href = item.href;
-                            const isActive = pathname === href;
-
+                        .map(item => {
+                            const isActive = pathname === item.href;
                             return (
                                 <Link
                                     key={item.name}
-                                    href={href}
+                                    href={item.href}
                                     className={cn(
-                                        "flex items-center space-x-2 text-sm font-medium transition-all hover:text-white",
-                                        isActive ? "text-white" : "text-gray-400"
+                                        "relative transition-colors flex items-center gap-2",
+                                        isActive ? "text-white font-bold" : "text-blue-200 hover:text-white"
                                     )}
                                 >
-                                    <item.icon className={cn("w-4 h-4", isActive ? "text-teal-400" : "")} />
-                                    <span>{item.name}</span>
-                                    {isActive && (
-                                        <span className="w-1 h-1 bg-teal-400 rounded-full ml-1" />
-                                    )}
+                                    {isActive && <span className="w-1.5 h-1.5 rounded-full bg-blue-300"></span>}
+                                    {item.name}
                                 </Link>
                             );
                         })}
-                    {/* Unified Admin Center link */}
+
                     {session?.user?.role === 'ADMIN' && (
-                        <Link
-                            href="/admin"
-                            className={cn(
-                                "flex items-center space-x-2 text-sm font-medium transition-all hover:text-white",
-                                pathname === '/admin' ? "text-white" : "text-teal-400"
-                            )}
-                        >
-                            <ShieldCheck className={cn("w-4 h-4", pathname === '/admin' ? "text-teal-400" : "")} />
-                            <span>Admin Command Center</span>
+                        <Link href="/admin" className={cn("transition-colors flex items-center gap-2", pathname === '/admin' ? "text-white font-bold" : "text-blue-200 hover:text-white")}>
+                            Admin Center
                         </Link>
                     )}
                 </div>
 
-                <div className="flex items-center space-x-4">
-                    {status === 'loading' ? (
-                        <div className="w-9 h-9 rounded-full bg-white/10 animate-pulse border-2 border-white/5" />
-                    ) : status === 'authenticated' ? (
-                        <div className="flex items-center space-x-4">
+                <div className="flex items-center gap-5 ml-auto">
+                    {status === 'authenticated' ? (
+                        <>
+                            <button className="relative text-orange-400 hover:text-orange-300 transition-colors hidden sm:block">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                                <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-orange-500 rounded-full border-2 border-[#002f5a]"></span>
+                            </button>
+
                             <div className="flex flex-col items-end hidden lg:flex">
                                 <span className="text-xs font-semibold text-white">
-                                    {session.user?.name && session.user.name !== 'Citizen'
-                                        ? session.user.name
-                                        : session.user?.email?.split('@')[0] || 'User'}
+                                    {session.user?.name && session.user.name !== 'Citizen' ? session.user.name : session.user?.email?.split('@')[0] || 'User'}
                                 </span>
-                                <span className="text-[10px] text-gray-400 capitalize">
+                                <span className="text-[10px] text-blue-200 capitalize">
                                     {session.user?.role?.toLowerCase() || 'citizen'}
                                 </span>
                             </div>
+
                             <div className="group relative" ref={dropdownRef}>
-                                <button
-                                    className="flex items-center space-x-1 outline-none"
-                                    onClick={() => setDropdownOpen(!dropdownOpen)}
-                                >
+                                <button onClick={() => setDropdownOpen(!dropdownOpen)} className="w-8 h-8 rounded-full overflow-hidden border-2 border-white/20 hover:border-white transition-all bg-white/10 flex items-center justify-center">
                                     {session.user?.image ? (
-                                        <img
-                                            src={session.user.image}
-                                            alt="Profile"
-                                            className="w-9 h-9 rounded-full border-2 border-teal-500/50 object-cover"
-                                        />
+                                        <img src={session.user.image} alt="Profile" className="w-full h-full object-cover" />
                                     ) : (
-                                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-teal-400 to-blue-500 flex items-center justify-center border-2 border-teal-500/50">
-                                            <span className="text-sm font-bold text-white">
-                                                {(session.user?.name && session.user.name !== 'Citizen' ? session.user.name : session.user?.email?.split('@')[0] || 'U').charAt(0).toUpperCase()}
-                                            </span>
-                                        </div>
+                                        <span className="text-sm font-bold text-white">
+                                            {(session.user?.name && session.user.name !== 'Citizen' ? session.user.name : session.user?.email?.split('@')[0] || 'U').charAt(0).toUpperCase()}
+                                        </span>
                                     )}
                                 </button>
 
                                 <div className={cn(
-                                    "absolute right-0 top-full mt-2 w-48 py-2 bg-[#0a0a12]/90 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl transition-all duration-200",
-                                    dropdownOpen
-                                        ? "opacity-100 visible"
-                                        : "opacity-0 invisible md:group-hover:opacity-100 md:group-hover:visible"
+                                    "absolute right-0 top-full mt-2 w-48 py-2 bg-white rounded-xl shadow-2xl transition-all duration-200 border border-gray-100",
+                                    dropdownOpen ? "opacity-100 visible" : "opacity-0 invisible md:group-hover:opacity-100 md:group-hover:visible"
                                 )}>
-                                    <div className="px-4 py-2 border-b border-white/5 mb-2">
-                                        <p className="text-xs text-gray-400 truncate">{session.user?.email}</p>
+                                    <div className="px-4 py-2 border-b border-gray-100 mb-2">
+                                        <p className="text-xs text-gray-500 truncate">{session.user?.email}</p>
                                     </div>
-                                    <Link href="/profile" className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-white/5 transition-colors">
+                                    <Link href="/profile" className="block w-full text-left px-4 py-2 text-sm text-[#1e293b] hover:bg-gray-50 transition-colors">
                                         My Profile
                                     </Link>
-                                    {session.user?.role === 'ADMIN' && (
-                                        <>
-                                            <div className="mx-2 my-1 border-t border-white/5" />
-                                            <Link href="/admin" className="block w-full text-left px-4 py-2 text-sm text-teal-400 hover:bg-white/5 transition-colors flex items-center gap-2">
-                                                <ShieldCheck className="w-3.5 h-3.5" />
-                                                Admin Command Center
-                                            </Link>
-                                        </>
-                                    )}
-                                    <div className="mx-2 my-1 border-t border-white/5" />
-                                    <button
-                                        onClick={() => signOut({ callbackUrl: '/' })}
-                                        className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-white/5 transition-colors"
-                                    >
+                                    <button onClick={() => signOut({ callbackUrl: '/' })} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium">
                                         Sign Out
                                     </button>
                                 </div>
                             </div>
-                        </div>
+                        </>
                     ) : (
                         <Link href="/auth/signin">
-                            <Button variant="glass" size="sm">
+                            <Button size="sm" className="bg-[#f97316] hover:bg-[#ea580c] text-white rounded-lg shadow-md border-0 h-8 text-xs font-semibold px-4">
                                 Log In
-                            </Button>
-                        </Link>
-                    )}
-                    {status === 'authenticated' && session?.user?.role !== 'ADMIN' && (
-                        <Link href="/report">
-                            <Button size="sm" className="bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 text-white shadow-lg shadow-teal-500/20">
-                                New Report
                             </Button>
                         </Link>
                     )}

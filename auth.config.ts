@@ -32,6 +32,23 @@ export const authConfig = {
                 if (session.user.image) token.image = session.user.image;
                 if (session.user.name) token.name = session.user.name;
             }
+
+            // Refresh image from database on each session check to keep it persistent
+            if (token.id) {
+                try {
+                    const { default: prisma } = await import('@/lib/prisma');
+                    const dbUser = await prisma.user.findUnique({
+                        where: { id: token.id as string },
+                        select: { image: true },
+                    });
+                    if (dbUser?.image) {
+                        token.image = dbUser.image;
+                    }
+                } catch {
+                    // Silently fail — use cached token image
+                }
+            }
+
             return token;
         },
         async session({ session, token }) {

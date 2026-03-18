@@ -79,10 +79,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                             console.log(`[Auth] User found: ${user.id}. Syncing profile...`);
 
                             const dataToUpdate: any = {};
-                            // Always update image if we have one from Google
-                            if (picture && user.image !== picture) {
+                            // Only set Google image if user has NO image at all
+                            // This protects custom Cloudinary uploads from being overwritten
+                            if (picture && !user.image) {
                                 dataToUpdate.image = picture;
-                                user.image = picture; // Update in memory too!
+                                user.image = picture;
                             }
                             // Update name if it's default or different
                             if (name && (user.name === 'Citizen' || user.name !== name)) {

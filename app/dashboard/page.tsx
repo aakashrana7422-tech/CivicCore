@@ -29,7 +29,7 @@ export default async function DashboardPage() {
         <div className="min-h-screen pt-24 pb-12 px-4 space-y-8 max-w-7xl mx-auto">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-white">Community Dashboard</h1>
+                    <h1 className="text-3xl font-bold tracking-tight">Community Dashboard</h1>
                     <p className="text-muted-foreground">Real-time overview of infrastructure issues in your area.</p>
                 </div>
 
