@@ -4,6 +4,7 @@ import { z } from 'zod';
 import prisma from '@/lib/prisma';
 import { auth } from '@/auth';
 import cloudinary from "@/lib/cloudinary";
+import { triggerResolutionCall, triggerConfirmationCall } from '@/lib/retell';
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -18,7 +19,8 @@ const ReportSchema = z.object({
     latitude: z.coerce.number(),
     longitude: z.coerce.number(),
     address: z.string().optional(),
-    image: z.any(), // File object validation is tricky in Zod/Server Actions
+    phoneNumber: z.string().optional(),
+    image: z.any(),
 });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -72,10 +74,10 @@ export async function createReport(prevState: any, formData: FormData) {
         return { error: validatedFields.error.flatten().fieldErrors };
     }
 
-    const { title, description, category, severity, latitude, longitude, address } = validatedFields.data;
+    const { title, description, category, severity, latitude, longitude, address, phoneNumber } = validatedFields.data;
 
     try {
-        await prisma.complaint.create({
+        const newComplaint = await prisma.complaint.create({
             data: {
                 title,
                 description,
@@ -88,10 +90,24 @@ export async function createReport(prevState: any, formData: FormData) {
                 userId: session.user.id,
                 status: 'PENDING',
             },
+            include: { user: true }
         });
 
-        // Gamification: Initial points for reporting? 
-        // Plan says: Verified Report: +10. So PENDING gets 0.
+        // Trigger confirmation call after 10 seconds
+        // Use the phone number provided in the report, or fallback to the user's profile number
+        const targetPhone = phoneNumber || newComplaint.user.phoneNumber;
+        
+        if (targetPhone) {
+            console.log(`[Action] Scheduling confirmation call for ${newComplaint.user.name} at ${targetPhone} in 10s...`);
+            setTimeout(() => {
+                triggerConfirmationCall(
+                    targetPhone,
+                    newComplaint.user.name || 'Citizen',
+                    newComplaint.title,
+                    newComplaint.id
+                ).catch(err => console.error('[Action] Scheduled call failed:', err));
+            }, 10000);
+        }
 
     } catch (e) {
         console.error("DB Error", e);
@@ -210,10 +226,20 @@ export async function resolveComplaintAction(formData: FormData) {
             });
 
             // Karma: +10 for verified report
-            await tx.user.update({
+            const updatedUser = await tx.user.update({
                 where: { id: complaint.userId },
                 data: { karmaPoints: { increment: 10 } }
             });
+
+            // Retell AI: Trigger resolution call if phone number exists
+            if (updatedUser.phoneNumber) {
+                console.log(`[Action] Triggering Retell call for user: ${updatedUser.name}`);
+                await triggerResolutionCall(
+                    updatedUser.phoneNumber,
+                    updatedUser.name || 'Citizen',
+                    complaint.title
+                );
+            }
 
             // Send Email (Resend) - Mocked for hackathon if no key
             // console.log("Sending email to user...");

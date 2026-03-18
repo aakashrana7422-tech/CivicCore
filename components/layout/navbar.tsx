@@ -4,14 +4,15 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { LayoutDashboard, PlusCircle, ShieldCheck, Home } from 'lucide-react';
+import { LayoutDashboard, PlusCircle, Home, ClipboardList } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSession, signOut } from 'next-auth/react';
 
 const navItems = [
     { name: 'Home', href: '/', icon: Home },
+    { name: 'Report Issue', href: '/report', icon: PlusCircle },
+    { name: 'My Reports', href: '/my-reports', icon: ClipboardList },
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'Report', href: '/report', icon: PlusCircle },
 ];
 
 export function Navbar() {
@@ -43,7 +44,6 @@ export function Navbar() {
     // If on homepage, hide this generic navbar since homepage has a custom one
     if (pathname === '/') return null;
 
-
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 bg-[#002f5a] text-white px-6 py-4 flex items-center justify-between shadow-md">
             <div className="flex items-center gap-8 w-full max-w-[1200px] mx-auto">
@@ -61,7 +61,9 @@ export function Navbar() {
                 <div className="hidden md:flex items-center gap-6 text-[13px] font-medium tracking-wide">
                     {navItems
                         .filter(item => {
-                            if (session?.user?.role === 'ADMIN' && (item.name === 'Report' || item.name === 'Dashboard')) return false;
+                            // Hide citizen-specific nav items for admin
+                            if (session?.user?.role === 'ADMIN' &&
+                                (item.name === 'Report Issue' || item.name === 'Dashboard' || item.name === 'My Reports')) return false;
                             return true;
                         })
                         .map(item => {
@@ -82,23 +84,34 @@ export function Navbar() {
                         })}
 
                     {session?.user?.role === 'ADMIN' && (
-                        <Link href="/admin" className={cn("transition-colors flex items-center gap-2", pathname === '/admin' ? "text-white font-bold" : "text-blue-200 hover:text-white")}>
+                        <Link
+                            href="/admin"
+                            className={cn(
+                                "transition-colors flex items-center gap-2",
+                                pathname === '/admin' ? "text-white font-bold" : "text-blue-200 hover:text-white"
+                            )}
+                        >
                             Admin Center
                         </Link>
                     )}
                 </div>
 
-                <div className="flex items-center gap-5 ml-auto">
+                <div className="flex items-center gap-3 ml-auto">
                     {status === 'authenticated' ? (
                         <>
                             <button className="relative text-orange-400 hover:text-orange-300 transition-colors hidden sm:block">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                                </svg>
                                 <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-orange-500 rounded-full border-2 border-[#002f5a]"></span>
                             </button>
 
-                            <div className="flex flex-col items-end hidden lg:flex">
+                            <div className="flex-col items-end hidden lg:flex">
                                 <span className="text-xs font-semibold text-white">
-                                    {session.user?.name && session.user.name !== 'Citizen' ? session.user.name : session.user?.email?.split('@')[0] || 'User'}
+                                    {session.user?.name && session.user.name !== 'Citizen'
+                                        ? session.user.name
+                                        : session.user?.email?.split('@')[0] || 'User'}
                                 </span>
                                 <span className="text-[10px] text-blue-200 capitalize">
                                     {session.user?.role?.toLowerCase() || 'citizen'}
@@ -106,12 +119,18 @@ export function Navbar() {
                             </div>
 
                             <div className="group relative" ref={dropdownRef}>
-                                <button onClick={() => setDropdownOpen(!dropdownOpen)} className="w-8 h-8 rounded-full overflow-hidden border-2 border-white/20 hover:border-white transition-all bg-white/10 flex items-center justify-center">
+                                <button
+                                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                                    className="w-8 h-8 rounded-full overflow-hidden border-2 border-white/20 hover:border-white transition-all bg-white/10 flex items-center justify-center"
+                                >
                                     {session.user?.image ? (
                                         <img src={session.user.image} alt="Profile" className="w-full h-full object-cover" />
                                     ) : (
                                         <span className="text-sm font-bold text-white">
-                                            {(session.user?.name && session.user.name !== 'Citizen' ? session.user.name : session.user?.email?.split('@')[0] || 'U').charAt(0).toUpperCase()}
+                                            {(session.user?.name && session.user.name !== 'Citizen'
+                                                ? session.user.name
+                                                : session.user?.email?.split('@')[0] || 'U'
+                                            ).charAt(0).toUpperCase()}
                                         </span>
                                     )}
                                 </button>
@@ -126,19 +145,36 @@ export function Navbar() {
                                     <Link href="/profile" className="block w-full text-left px-4 py-2 text-sm text-[#1e293b] hover:bg-gray-50 transition-colors">
                                         My Profile
                                     </Link>
-                                    <button onClick={() => signOut({ callbackUrl: '/' })} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium">
+                                    <button
+                                        onClick={() => signOut({ callbackUrl: '/' })}
+                                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium"
+                                    >
                                         Sign Out
                                     </button>
                                 </div>
                             </div>
                         </>
-                    ) : (
-                        <Link href="/auth/signin">
-                            <Button size="sm" className="bg-[#f97316] hover:bg-[#ea580c] text-white rounded-lg shadow-md border-0 h-8 text-xs font-semibold px-4">
-                                Log In
-                            </Button>
-                        </Link>
-                    )}
+                    ) : status === 'unauthenticated' ? (
+                        <div className="flex items-center gap-2">
+                            <Link href="/auth/signin">
+                                <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="text-blue-200 hover:text-white hover:bg-white/10 rounded-lg h-8 text-xs font-semibold px-4 border border-white/20"
+                                >
+                                    Log In
+                                </Button>
+                            </Link>
+                            <Link href="/auth/signup">
+                                <Button
+                                    size="sm"
+                                    className="bg-[#f97316] hover:bg-[#ea580c] text-white rounded-lg shadow-md border-0 h-8 text-xs font-semibold px-4"
+                                >
+                                    Sign Up
+                                </Button>
+                            </Link>
+                        </div>
+                    ) : null}
                 </div>
             </div>
         </nav>

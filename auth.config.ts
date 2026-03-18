@@ -66,10 +66,16 @@ export const authConfig = {
             const isOnAdmin = nextUrl.pathname.startsWith('/admin');
             const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');
             const isOnReport = nextUrl.pathname.startsWith('/report');
+            const isOnMyReports = nextUrl.pathname.startsWith('/my-reports');
             const isOnComplaints = nextUrl.pathname.startsWith('/complaints');
             const isOnAuth = nextUrl.pathname.startsWith('/auth');
+            const isOnProfile = nextUrl.pathname.startsWith('/profile');
 
-            // 1. If user is logged in and trying to access sign-in page, redirect to their dashboard
+            // Helper: redirect unauthenticated users to signup
+            const redirectToSignup = () =>
+                Response.redirect(new URL('/auth/signup', nextUrl));
+
+            // 1. If user is logged in and trying to access auth pages, redirect to their dashboard
             if (isOnAuth && isLoggedIn) {
                 const dashboard = role === 'ADMIN' ? '/admin' : '/dashboard';
                 return Response.redirect(new URL(dashboard, nextUrl));
@@ -77,14 +83,14 @@ export const authConfig = {
 
             // 2. Admin protection
             if (isOnAdmin) {
-                if (!isLoggedIn) return false; // Redirect to sign-in
+                if (!isLoggedIn) return redirectToSignup();
                 if (role === 'ADMIN') return true;
                 return Response.redirect(new URL('/dashboard', nextUrl)); // Citizen tried to access admin
             }
 
             // 3. User Dashboard & Report protection
             if (isOnDashboard || isOnReport) {
-                if (!isLoggedIn) return false; // Redirect to sign-in
+                if (!isLoggedIn) return redirectToSignup();
 
                 // If an Admin tries to access Citizen areas, redirect to Admin Dashboard
                 if (role === 'ADMIN') {
@@ -93,9 +99,21 @@ export const authConfig = {
                 return true;
             }
 
-            // 4. Complaint detail pages - require login, both roles allowed
+            // 4. My Reports - require login
+            if (isOnMyReports) {
+                if (!isLoggedIn) return redirectToSignup();
+                return true;
+            }
+
+            // 5. Profile page - require login
+            if (isOnProfile) {
+                if (!isLoggedIn) return redirectToSignup();
+                return true;
+            }
+
+            // 6. Complaint detail pages - require login, both roles allowed
             if (isOnComplaints) {
-                if (!isLoggedIn) return false;
+                if (!isLoggedIn) return redirectToSignup();
                 return true;
             }
 

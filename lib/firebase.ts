@@ -1,7 +1,8 @@
-import { initializeApp, getApps, getApp } from "firebase/app";
+import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
 // import { getAnalytics } from "firebase/analytics";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { getAuth, Auth } from "firebase/auth";
+import { getFirestore, Firestore } from "firebase/firestore";
+
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
     authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -11,10 +12,21 @@ const firebaseConfig = {
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Initialize Firebase (Singleton pattern)
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+// Initialize Firebase only if API key is present
+let app: FirebaseApp | undefined;
+let auth: Auth | undefined;
+let db: Firestore | undefined;
 
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "undefined") {
+    try {
+        app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+        auth = getAuth(app);
+        db = getFirestore(app);
+    } catch (error) {
+        console.error("Firebase initialization failed:", error);
+    }
+}
 
+export { auth, db };
 export default app;
+

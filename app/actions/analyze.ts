@@ -37,6 +37,8 @@ export interface AnalyzeResult {
     confidence?: number;
     rawScores?: { label: string; score: number }[];
     method?: string;
+    isAI?: boolean;
+    aiConfidence?: number;
     error?: string;
 }
 
@@ -61,6 +63,8 @@ export async function analyzeImage(formData: FormData): Promise<AnalyzeResult> {
                 confidence: 0,
                 rawScores: [],
                 method: result.method,
+                isAI: result.isAI,
+                aiConfidence: result.aiConfidence,
             };
         }
 
@@ -82,6 +86,8 @@ export async function analyzeImage(formData: FormData): Promise<AnalyzeResult> {
             confidence: result.confidence,
             rawScores: result.rawScores,
             method: result.method,
+            isAI: result.isAI,
+            aiConfidence: result.aiConfidence,
         };
     } catch (error) {
         console.error("Analyze Action Error:", error);

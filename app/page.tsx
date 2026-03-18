@@ -1,10 +1,25 @@
 'use client';
 
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { Bell, User, MapPin, CheckCircle2, AlertTriangle, Lightbulb, Droplet, Menu, ShieldCheck, PlusCircle } from 'lucide-react';
-import { usePathname } from 'next/navigation';
+import { MapPin, AlertTriangle, Lightbulb, Droplet, Menu, ShieldCheck, PlusCircle, User } from 'lucide-react';
+import { useSession, signOut } from 'next-auth/react';
 
 export default function Home() {
+  const { data: session, status } = useSession();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: `
@@ -36,17 +51,81 @@ export default function Home() {
                 <Link href="/dashboard" className="text-blue-200 hover:text-white transition-colors" style={{ color: '#bfdbfe' }}>Dashboard</Link>
             </nav>
           </div>
-          <div className="flex items-center gap-5 pr-6">
-            <button className="relative text-orange-400 hover:text-orange-300 transition-colors">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-              <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-orange-500 rounded-full border-2 border-[#002f5a]"></span>
-            </button>
-            <button className="text-blue-200 hover:text-white">
-               <Menu className="w-5 h-5" />
-            </button>
-            <Link href="/profile" className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center border border-white/20 cursor-pointer">
-               <User className="w-4 h-4 text-white" />
-            </Link>
+          <div className="flex items-center gap-3 pr-6">
+            {status === 'authenticated' ? (
+              <>
+                <button className="relative text-orange-400 hover:text-orange-300 transition-colors hidden sm:block">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                  </svg>
+                  <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-orange-500 rounded-full border-2 border-[#002f5a]"></span>
+                </button>
+
+                <div className="flex-col items-end hidden lg:flex">
+                  <span className="text-xs font-semibold text-white">
+                    {session?.user?.name && session.user.name !== 'Citizen'
+                      ? session.user.name
+                      : session?.user?.email?.split('@')[0] || 'User'}
+                  </span>
+                  <span className="text-[10px] text-blue-200 capitalize">
+                    {session?.user?.role?.toLowerCase() || 'citizen'}
+                  </span>
+                </div>
+
+                <div className="group relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                    className="w-8 h-8 rounded-full overflow-hidden border-2 border-white/20 hover:border-white transition-all bg-white/10 flex items-center justify-center"
+                  >
+                    {session?.user?.image ? (
+                      <img src={session.user.image} alt="Profile" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-sm font-bold text-white">
+                        {(session?.user?.name && session.user.name !== 'Citizen'
+                          ? session.user.name
+                          : session?.user?.email?.split('@')[0] || 'U'
+                        ).charAt(0).toUpperCase()}
+                      </span>
+                    )}
+                  </button>
+
+                  <div className={`absolute right-0 top-full mt-2 w-48 py-2 bg-white rounded-xl shadow-2xl border border-gray-100 transition-all duration-200 ${
+                    dropdownOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+                  }`}>
+                    <div className="px-4 py-2 border-b border-gray-100 mb-2">
+                      <p className="text-xs text-gray-500 truncate">{session?.user?.email}</p>
+                    </div>
+                    <Link href="/profile" className="block w-full text-left px-4 py-2 text-sm text-[#1e293b] hover:bg-gray-50 transition-colors">
+                      My Profile
+                    </Link>
+                    <button
+                      onClick={() => signOut({ callbackUrl: '/' })}
+                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                </div>
+              </>
+            ) : status === 'unauthenticated' ? (
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/auth/signin"
+                  className="text-blue-200 hover:text-white transition-colors text-xs font-semibold px-4 h-8 flex items-center rounded-lg border border-white/20 hover:bg-white/10"
+                >
+                  Log In
+                </Link>
+                <Link
+                  href="/auth/signup"
+                  className="bg-[#f97316] hover:bg-[#ea580c] text-white text-xs font-semibold px-4 h-8 flex items-center rounded-lg shadow-md transition-colors"
+                >
+                  Sign Up
+                </Link>
+              </div>
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-white/10 animate-pulse" />
+            )}
           </div>
         </div>
 

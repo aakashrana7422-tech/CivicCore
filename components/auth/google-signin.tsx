@@ -27,6 +27,7 @@ export function GoogleSignInButton() {
     };
 
     const handleGoogleSignIn = async () => {
+        if (!auth) return;
         setIsLoading(true);
         try {
             const provider = new GoogleAuthProvider();
@@ -71,6 +72,8 @@ export function GoogleSignInButton() {
             setIsLoading(false);
         }
     };
+
+    if (!auth) return null;
 
     return (
         <Button

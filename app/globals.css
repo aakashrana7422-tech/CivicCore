@@ -59,24 +59,25 @@
   }
 }
 
-/* Force light text on hardcoded white/black Tailwind utility classes */
+/* Ensure white text is actually white */
 .text-white {
-  color: #1e293b; 
+  color: #ffffff !important;
 }
 .force-white {
   color: #ffffff !important;
 }
 .text-gray-400 {
-  color: #475569 !important;
+  color: #94a3b8 !important;
 }
 .bg-black\/40, .bg-\[\#0a0a12\]\/90, .glass-card, .glass-panel {
-  background-color: #ffffff !important;
-  border-color: #e2e8f0 !important;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(12px);
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
-/* Nav is immune from the global text-white overwrite because its scoped explicitly */
-nav .text-white, .bg-\[\#002f5a\] .text-white, .hero-text {
+/* Nav and dark sections should always have white text */
+nav .text-white, .bg-\[\#002f5a\] .text-white, .bg-\[\#001d3d\] .text-white, .hero-text {
   color: #ffffff !important;
 }
 nav .text-blue-200 {

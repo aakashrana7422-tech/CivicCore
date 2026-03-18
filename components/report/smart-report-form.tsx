@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import exifr from 'exif-js';
-import { Loader2, MapPin, Upload, Wand2, Brain, Sparkles, Eye, BarChart3 } from 'lucide-react';
+import { Loader2, MapPin, Upload, Wand2, Brain, Sparkles, Eye, BarChart3, ShieldCheck, AlertCircle, Fingerprint } from 'lucide-react';
 import Image from 'next/image';
 
 // Mock or Real Reverse Geocoding
@@ -41,6 +41,7 @@ export function SmartReportForm() {
     const [description, setDescription] = useState('');
     const [category, setCategory] = useState('');
     const [severity, setSeverity] = useState('MEDIUM');
+    const [phoneNumber, setPhoneNumber] = useState('');
 
     // AI Analysis Data
     const [aiData, setAiData] = useState<AnalyzeResult | null>(null);
@@ -377,6 +378,58 @@ export function SmartReportForm() {
                                     </div>
                                 )}
 
+                                {/* ══════ Authenticity Verification ══════ */}
+                                <div className="pt-2 border-t border-white/10 mt-4">
+                                    {aiData.aiConfidence && aiData.aiConfidence > 0 ? (
+                                        <>
+                                            <div className="flex items-center justify-between bg-white/5 rounded-xl p-4 border border-white/10">
+                                                <div className="flex items-center gap-3">
+                                                    <div className={`p-2 rounded-lg ${aiData.isAI ? 'bg-red-500/20 text-red-400' : 'bg-emerald-500/20 text-emerald-400'}`}>
+                                                        {aiData.isAI ? <AlertCircle className="w-5 h-5" /> : <ShieldCheck className="w-5 h-5" />}
+                                                    </div>
+                                                    <div>
+                                                        <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+                                                            <Fingerprint className="w-3 h-3" />
+                                                            Image Authenticity
+                                                        </div>
+                                                        <div className={`text-sm font-bold ${aiData.isAI ? 'text-red-400' : 'text-emerald-400'}`}>
+                                                            {aiData.isAI ? 'Flagged: AI Generated' : 'Verified: Authentic Image'}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <div className="text-[10px] text-muted-foreground uppercase">Confidence</div>
+                                                    <div className={`text-xs font-mono font-bold ${aiData.isAI ? 'text-red-400' : 'text-emerald-400'}`}>
+                                                        {(aiData.aiConfidence * 100).toFixed(1)}%
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {aiData.isAI && (
+                                                <p className="mt-2 text-[10px] text-red-300/60 leading-tight px-1">
+                                                    Warning: This image shows patterns consistent with AI generation. Fraudulent reports may result in account deactivation.
+                                                </p>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <div className="flex items-center justify-between bg-white/5 rounded-xl p-4 border border-white/10">
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 rounded-lg bg-yellow-500/20 text-yellow-400">
+                                                    <Fingerprint className="w-5 h-5" />
+                                                </div>
+                                                <div>
+                                                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+                                                        <Fingerprint className="w-3 h-3" />
+                                                        Image Authenticity
+                                                    </div>
+                                                    <div className="text-sm font-bold text-yellow-400">
+                                                        Scan Pending — Model Loading...
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
                                 {/* Method Badge */}
                                 <div className="text-xs text-muted-foreground/60 text-right">
                                     Powered by {aiData.method === 'resnet-bart' ? 'CivicLens AI Engine' : aiData.method === 'keyword' ? 'Keyword Analysis' : 'AI Analysis'}
@@ -462,6 +515,22 @@ export function SmartReportForm() {
                                 <option value="CRITICAL">Critical</option>
                             </select>
                         </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="phoneNumber">Phone Number (For AI Confirmation Call)</Label>
+                        <Input
+                            name="phoneNumber"
+                            id="phoneNumber"
+                            type="tel"
+                            value={phoneNumber}
+                            onChange={(e) => setPhoneNumber(e.target.value)}
+                            placeholder="+91XXXXXXXXXX"
+                            className="bg-white/5"
+                        />
+                        <p className="text-[10px] text-muted-foreground mt-1 text-emerald-400 font-medium">
+                            Step 2: You will receive an AI voice call 10 seconds after submission to confirm this report.
+                        </p>
                     </div>
 
                     <div className="space-y-2">

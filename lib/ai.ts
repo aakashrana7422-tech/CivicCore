@@ -29,6 +29,8 @@ export interface AIAnalysisResult {
     confidence: number;
     rawScores: { label: string; score: number }[];
     method: 'resnet-bart' | 'keyword' | 'fallback';
+    isAI?: boolean;
+    aiConfidence?: number;
 }
 
 /**
@@ -138,13 +140,95 @@ async function classifyIntoCivicCategory(resnetLabels: string[]): Promise<{
 }
 
 /**
+ * Step 3: Detect if image is AI generated.
+ * Uses the same InferenceClient SDK that works for ResNet-50.
+ * Tries multiple models in sequence until one responds.
+ */
+async function detectAIImage(imageBuffer: ArrayBuffer): Promise<{ isAI: boolean; confidence: number } | null> {
+    // Models to try, in order of preference
+    const MODELS = [
+        "Organika/sdxl-detector",
+        "umm-maybe/AI-image-detector",
+    ];
+
+    for (const model of MODELS) {
+        try {
+            console.log(`[AI] Step 3: Trying AI detection with ${model}...`);
+
+            const output = await client.imageClassification({
+                data: new Blob([imageBuffer], { type: "image/jpeg" }),
+                model,
+                provider: "hf-inference",
+            });
+
+            if (Array.isArray(output) && output.length > 0) {
+                console.log(`[AI] AI Detection raw (${model}):`, JSON.stringify(output.slice(0, 4)));
+                return parseAIDetectionResult(output);
+            }
+        } catch (e: any) {
+            console.error(`[AI] ${model} failed:`, e.message?.substring(0, 150));
+            // Try next model
+        }
+    }
+
+    // All models failed — try without provider as last resort
+    for (const model of MODELS) {
+        try {
+            console.log(`[AI] Retrying ${model} without provider...`);
+
+            const output = await client.imageClassification({
+                data: new Blob([imageBuffer], { type: "image/jpeg" }),
+                model,
+            });
+
+            if (Array.isArray(output) && output.length > 0) {
+                console.log(`[AI] AI Detection raw (${model}, no-provider):`, JSON.stringify(output.slice(0, 4)));
+                return parseAIDetectionResult(output);
+            }
+        } catch (e: any) {
+            console.error(`[AI] ${model} (no-provider) failed:`, e.message?.substring(0, 150));
+        }
+    }
+
+    console.error("[AI] All AI detection models failed.");
+    return null;
+}
+
+function parseAIDetectionResult(data: any[]): { isAI: boolean; confidence: number } | null {
+    if (!data || data.length === 0) return null;
+
+    const aiLabels = ['artificial', 'ai_generated', 'ai', 'fake', 'deepfake'];
+    const humanLabels = ['real', 'human', 'realism', 'authentic'];
+
+    let aiScore = 0;
+    let humanScore = 0;
+
+    for (const item of data) {
+        const label = (item.label || '').toLowerCase();
+        if (aiLabels.some(l => label.includes(l))) aiScore = Math.max(aiScore, item.score || 0);
+        if (humanLabels.some(l => label.includes(l))) humanScore = Math.max(humanScore, item.score || 0);
+    }
+
+    console.log(`[AI] AI Detection: AI=${(aiScore * 100).toFixed(1)}%, Human=${(humanScore * 100).toFixed(1)}%`);
+
+    return {
+        isAI: aiScore > humanScore,
+        confidence: Math.max(aiScore, humanScore)
+    };
+}
+
+/**
  * Full AI analysis pipeline:
  *   Step 1: ResNet-50 → raw image labels
  *   Step 2: BART zero-shot → civic category classification
+ *   Step 3: AI Image Detector → Authenticity check
  */
 export async function analyzeImageFull(imageBuffer: ArrayBuffer, fileName: string = ""): Promise<AIAnalysisResult> {
-    // Step 1: Get ResNet labels
-    const resnetLabels = await getImageLabels(imageBuffer);
+    // Run detection and classification in parallel for performance
+    const [resnetLabels, aiDetection] = await Promise.all([
+        getImageLabels(imageBuffer),
+        detectAIImage(imageBuffer)
+    ]);
 
     if (resnetLabels && resnetLabels.length > 0) {
         // Step 2: Classify into civic categories
@@ -160,6 +244,8 @@ export async function analyzeImageFull(imageBuffer: ArrayBuffer, fileName: strin
                 confidence: classification.confidence,
                 rawScores: classification.rawScores,
                 method: 'resnet-bart',
+                isAI: aiDetection?.isAI,
+                aiConfidence: aiDetection?.confidence
             };
         }
 
@@ -172,6 +258,8 @@ export async function analyzeImageFull(imageBuffer: ArrayBuffer, fileName: strin
             confidence: keywordLabel ? 0.6 : 0,
             rawScores: [],
             method: 'keyword',
+            isAI: aiDetection?.isAI,
+            aiConfidence: aiDetection?.confidence
         };
     }
 
@@ -183,6 +271,8 @@ export async function analyzeImageFull(imageBuffer: ArrayBuffer, fileName: strin
         confidence: keywordLabel ? 0.5 : 0,
         rawScores: [],
         method: 'keyword',
+        isAI: aiDetection?.isAI,
+        aiConfidence: aiDetection?.confidence
     };
 }
 
